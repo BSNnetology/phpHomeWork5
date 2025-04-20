@@ -37,7 +37,7 @@ function showCalendar(int $year, int $month, int $monthCount): void {
         echo str_repeat("\t", $weekDay === 0 ? 6 : $weekDay - 1);
         $weekDay = $weekDay === 0 ? 7 : $weekDay;
 
-        for ($j = 1; $j <= (int) date('t', $dateMonth); $j++) {
+        for ($j = 1; $j <= $daysInMouth; $j++) {
             if ($weekDay > 7) {
                 $weekDay = 1;
                 echo "\n";
@@ -61,11 +61,6 @@ function showCalendarHeader(int $dateMonth): void {
 }
 
 // -------------------
-function getCurrentDate(int $j, int $dateMonth): DateTime {
-    return new DateTime('@' . strtotime('+' . ($j - 1) . ' day', $dateMonth));
-}
-
-// -------------------
 function showCalendarDay(string $date, int $result): void {
     switch ($result) {
         case -1:
@@ -81,6 +76,11 @@ function showCalendarDay(string $date, int $result): void {
 }
 
 // -------------------
+function getCurrentDate(int $j, int $dateMonth): DateTime {
+    return new DateTime('@' . strtotime('+' . ($j - 1) . ' day', $dateMonth));
+}
+
+// -------------------
 function checkHoligay(int $weekDay, DateTime $currentDate): bool {
     return ($weekDay > 5) || (in_array($currentDate->format('*-m-d'), HOLIDAYS));
 }
@@ -91,7 +91,7 @@ function getDayStatus(int $dateMonth, int $j, int $weekDay, int &$workDay): int 
     $isHoliday = checkHoligay($weekDay, $currentDate);
     $isWorkDay = ($j === $workDay);
 
-    if (($j === $workDay) && $isHoliday) {
+    if ($isWorkDay && $isHoliday) {
         $workDay++;
     }
 
