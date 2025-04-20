@@ -2,7 +2,7 @@
 
 $month = 4;
 $year = 2025;
-$monthCount = 3;
+$monthsCount = 3;
 
 system('clear'); // system('cls'); // windows
 const HOLIDAYS = ['*-01-01', '*-01-07', '*-03-08', '*-05-01', '*-05-09', '*-06-12', '*-11-04'];
@@ -13,26 +13,26 @@ if ($year < 2000 || $year > 2050) {
 } elseif ($month < 1 || $month > 12) {
     echo "Некорректно указан месяц (1 - 12)...\n";
     exit;
-} elseif ($monthCount < 1 || $monthCount > 12) {
+} elseif ($monthsCount < 1 || $monthsCount > 12) {
     echo "Некорректно указано количество месяцев (1 - 12)...\n";
     exit;
 }
 
-showCalendar($year, $month, $monthCount);
+showCalendar($year, $month, $monthsCount);
 echo "\n";
 
 // -------------------
-function showCalendar(int $year, int $month, int $monthCount): void {
+function showCalendar(int $year, int $month, int $monthsCount): void {
     $dateStart = mktime(0, 0, 0, $month, 1, $year);   
     $workDay = 1;
 
-    for ($i = 0; $i < $monthCount; $i++) {
-        $dateMonth = strtotime('+' . $i . ' month', $dateStart);
-        showCalendarHeader($dateMonth);
+    for ($i = 0; $i < $monthsCount; $i++) {
+        $currentMonth = strtotime('+' . $i . ' month', $dateStart);
+        showCalendarHeader($currentMonth);
 
         $workDay = isset($daysInMouth) ? $workDay - $daysInMouth : 1;
-        $daysInMouth = (int) date('t', $dateMonth);
-        $weekDay = (int) date('w', $dateMonth);
+        $daysInMouth = (int) date('t', $currentMonth);
+        $weekDay = (int) date('w', $currentMonth);
 
         echo str_repeat("\t", $weekDay === 0 ? 6 : $weekDay - 1);
         $weekDay = $weekDay === 0 ? 7 : $weekDay;
@@ -43,9 +43,9 @@ function showCalendar(int $year, int $month, int $monthCount): void {
                 echo "\n";
             }
             
-            $date = $j < 10 ? " $j" : $j;
-            $result = getDayStatus($dateMonth, $j, $weekDay, $workDay);
-            showCalendarDay($date, $result);
+            $printDate = $j < 10 ? " $j" : $j;
+            $result = getDayStatus($currentMonth, $j, $weekDay, $workDay);
+            showCalendarDay($printDate, $result);
 
             $weekDay++;
         }
@@ -54,30 +54,30 @@ function showCalendar(int $year, int $month, int $monthCount): void {
 }
 
 // -------------------
-function showCalendarHeader(int $dateMonth): void {
-    echo "\n" . date("F Y", $dateMonth) . "\n";
+function showCalendarHeader(int $currentMonth): void {
+    echo "\n" . date("F Y", $currentMonth) . "\n";
     echo "Mо\tTo\tWe\tTh\tFr\t";
     echo "\033[31mSa\tSu\033[0m\n";
 }
 
 // -------------------
-function showCalendarDay(string $date, int $result): void {
+function showCalendarDay(string $printDate, int $result): void {
     switch ($result) {
         case -1:
-            echo "\033[31m$date\t\033[0m";
+            echo "\033[31m$printDate\t\033[0m";
             break;
         case 1:
-            echo "\033[32m$date\t\033[0m";;
+            echo "\033[32m$printDate\t\033[0m";;
             break;
         default:
-            echo "$date\t";
+            echo "$printDate\t";
             break;
     }
 }
 
 // -------------------
-function getCurrentDate(int $j, int $dateMonth): DateTime {
-    return new DateTime('@' . strtotime('+' . ($j - 1) . ' day', $dateMonth));
+function getCurrentDate(int $day, int $currentMonth): DateTime {
+    return new DateTime('@' . strtotime('+' . ($day - 1) . ' day', $currentMonth));
 }
 
 // -------------------
@@ -86,10 +86,10 @@ function checkHoligay(int $weekDay, DateTime $currentDate): bool {
 }
 
 // -------------------
-function getDayStatus(int $dateMonth, int $j, int $weekDay, int &$workDay): int {   
-    $currentDate = getCurrentDate($j, $dateMonth);
+function getDayStatus(int $currentMonth, int $day, int $weekDay, int &$workDay): int {   
+    $currentDate = getCurrentDate($day, $currentMonth);
     $isHoliday = checkHoligay($weekDay, $currentDate);
-    $isWorkDay = ($j === $workDay);
+    $isWorkDay = ($day === $workDay);
 
     if ($isWorkDay && $isHoliday) {
         $workDay++;
